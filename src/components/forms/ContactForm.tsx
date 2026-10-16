@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 
 type Status = "idle" | "loading" | "success" | "error";
@@ -12,6 +12,13 @@ const LABEL_CLASSES = "text-sm font-medium text-foreground";
 
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
+  const [initialMessage, setInitialMessage] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const need = params.get("need");
+    if (need) setInitialMessage(need.slice(0, 2000));
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -112,6 +119,7 @@ export function ContactForm() {
           name="message"
           required
           rows={5}
+          defaultValue={initialMessage}
           className={INPUT_CLASSES}
         />
       </div>
