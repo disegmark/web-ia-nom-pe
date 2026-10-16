@@ -39,7 +39,7 @@ export function ProcessFlow({ steps, className }: { steps: ProcessStep[]; classN
           return (
             <Reveal key={step.title} delay={index * 0.08}>
               <li>
-                <button
+                <motion.button
                   type="button"
                   onClick={() => setActiveIndex(index)}
                   aria-pressed={isActive}
@@ -49,7 +49,7 @@ export function ProcessFlow({ steps, className }: { steps: ProcessStep[]; classN
                 >
                   <SignMarker index={index} active={isActive} accent={accent} />
 
-                  <div
+                  <motion.div
                     animate={{ opacity: isActive ? 1 : 0.76 }}
                     className={cn(
                       "plate flex-1 p-4 transition-all duration-200 lg:mt-1",
@@ -63,8 +63,8 @@ export function ProcessFlow({ steps, className }: { steps: ProcessStep[]; classN
                     ) : null}
                     <p className="font-display font-semibold text-foreground">{step.title}</p>
                     <p className="mt-1 text-sm leading-relaxed text-muted">{step.description}</p>
-                  </div>
-                </button>
+                  </motion.div>
+                </motion.button>
               </li>
             </Reveal>
           );

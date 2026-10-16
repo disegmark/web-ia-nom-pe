@@ -57,7 +57,7 @@ export function AutomationPlayground() {
         <div className="border-b border-border p-3 lg:border-b-0 lg:border-r">
           <p className="px-3 py-2 text-[10px] font-medium uppercase tracking-[.16em] text-muted">Elige un escenario</p>
           <div className="flex gap-2 overflow-x-auto lg:flex-col">
-            {DEMOS.map((item, index) => (
+            {DEMOS.map((item) => (
               <motion.button
                 key={item.id}
                 type="button"
