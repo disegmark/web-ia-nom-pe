@@ -5,6 +5,7 @@ import { NetworkArt } from "@/components/illustrations/NetworkArt";
 import { Reveal } from "@/components/animations/Reveal";
 import type { SignAccent } from "@/components/signage/Signage";
 import { AUTOMATION_EXAMPLES } from "@/data/automation-examples";
+import { AutomationPlayground } from "./AutomationPlayground";
 
 const ACCENTS: SignAccent[] = ["cyan", "amber", "signal"];
 
@@ -22,6 +23,7 @@ export function AutomationSection() {
             className="max-w-none"
           />
         </div>
+        <AutomationPlayground />
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {AUTOMATION_EXAMPLES.map((example, index) => (
             <FeatureCard
