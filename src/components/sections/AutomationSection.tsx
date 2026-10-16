@@ -1,7 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeader } from "./SectionHeader";
 import { FeatureCard } from "@/components/cards/FeatureCard";
-import { AutomationFlow3D } from "@/components/illustrations/AutomationFlow3D";
+import { AutomationEcosystem } from "./AutomationEcosystem";
 import { Reveal } from "@/components/animations/Reveal";
 import type { SignAccent } from "@/components/signage/Signage";
 import { AUTOMATION_EXAMPLES } from "@/data/automation-examples";
@@ -19,8 +19,8 @@ export function AutomationSection() {
             description="La automatización permite que los equipos dediquen menos tiempo a tareas repetitivas y más tiempo a actividades estratégicas."
           />
         </Reveal>
-        <Reveal delay={0.1} className="mt-8">
-          <AutomationFlow3D />
+        <Reveal delay={0.1}>
+          <AutomationEcosystem />
         </Reveal>
         <Reveal delay={0.08} y={24}>
           <AutomationPlayground />
