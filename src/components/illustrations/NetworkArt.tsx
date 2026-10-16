@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import { useId } from "react";
 
 const GRADIENT_ID = "network-art-gradient";
@@ -341,80 +341,141 @@ export function NetworkArt({ variant, className }: { variant: NetworkArtVariant;
   const Component = VARIANTS[variant];
   const reduce = useReducedMotion();
   const sceneId = useId().replace(/:/g, "");
-  const sceneMotion = reduce
-    ? {}
-    : {
-        animate: {
-          rotateX: [0, 3.5, 0, -3.5, 0],
-          rotateY: [0, -5, 0, 5, 0],
-          rotateZ: [0, 0.8, 0, -0.8, 0],
-          y: [0, -7, 0, 5, 0],
-          scale: [1, 1.025, 1, 1.015, 1],
-        },
-        transition: { duration: 11, repeat: Infinity, ease: "easeInOut" as const },
-      };
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const rotateY = useSpring(pointerX, { stiffness: 90, damping: 18, mass: 0.6 });
+  const rotateX = useSpring(pointerY, { stiffness: 90, damping: 18, mass: 0.6 });
+
+  function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (reduce || event.pointerType === "touch") return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+    pointerX.set(x * 22);
+    pointerY.set(y * -18);
+  }
+
+  function resetPointer() {
+    pointerX.set(0);
+    pointerY.set(0);
+  }
 
   return (
-    <div className={className}>
+    <div
+      className={className}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={resetPointer}
+      onPointerCancel={resetPointer}
+      style={{ perspective: "1100px", touchAction: "pan-y" }}
+    >
       <motion.div
-        {...sceneMotion}
         data-scene={sceneId}
-        style={{ perspective: 1000, transformStyle: "preserve-3d", willChange: reduce ? "auto" : "transform" }}
         className="relative isolate mx-auto"
+        style={{
+          transformStyle: "preserve-3d",
+          rotateX: reduce ? 0 : rotateX,
+          rotateY: reduce ? 0 : rotateY,
+          willChange: reduce ? "auto" : "transform",
+        }}
       >
-        <div
-          className="pointer-events-none absolute inset-[12%] -z-10 rounded-full bg-cyan/10 blur-3xl"
-          style={{ transform: "translateZ(-36px) scale(1.15)" }}
-          aria-hidden="true"
-        />
+        {/* Deep volumetric light behind the network */}
         <motion.div
-          className="relative"
-          style={{ transformStyle: "preserve-3d", filter: "drop-shadow(0 18px 22px rgba(10,35,100,.22))" }}
-          animate={reduce ? undefined : { z: [0, 14, 0, -5, 0] }}
-          transition={reduce ? undefined : { duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
-        >
-          <Component />
-        </motion.div>
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-[4%] -z-20 rounded-full"
+          style={{
+            transform: "translateZ(-90px)",
+            background: "radial-gradient(ellipse at 50% 45%, rgba(56,211,255,.22), rgba(47,93,250,.12) 34%, transparent 70%)",
+            filter: "blur(24px)",
+          }}
+          animate={reduce ? undefined : { opacity: [0.35, 0.9, 0.35], scale: [0.88, 1.12, 0.88] }}
+          transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        {/* Two holographic orbital planes, moving at different speeds */}
         {!reduce && (
           <>
             <motion.div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-[8%] rounded-full border border-cyan/20"
-              style={{ transform: "translateZ(-18px) rotateX(68deg) rotateZ(-12deg)", boxShadow: "0 0 30px rgba(56,211,255,.08), inset 0 0 24px rgba(47,93,250,.08)" }}
-              animate={{ rotateZ: [-12, 12, -12], scale: [0.92, 1.08, 0.92], opacity: [0.25, 0.85, 0.25] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+              className="pointer-events-none absolute inset-[7%] rounded-[50%] border border-cyan/25"
+              style={{
+                transform: "translateZ(-35px) rotateX(66deg) rotateZ(-18deg)",
+                boxShadow: "0 0 26px rgba(56,211,255,.12), inset 0 0 22px rgba(47,93,250,.08)",
+              }}
+              animate={{ rotateZ: [-18, 18, -18], scale: [0.92, 1.06, 0.92], opacity: [0.25, 0.8, 0.25] }}
+              transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
             />
             <motion.div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-[18%] rounded-full border border-blue-500/20"
-              style={{ transform: "translateZ(24px) rotateX(72deg) rotateZ(22deg)" }}
-              animate={{ rotateZ: [22, -22, 22], scale: [1.08, 0.9, 1.08], opacity: [0.15, 0.65, 0.15] }}
-              transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+              className="pointer-events-none absolute inset-[15%] rounded-[50%] border border-blue-400/20"
+              style={{ transform: "translateZ(42px) rotateX(72deg) rotateZ(26deg)" }}
+              animate={{ rotateZ: [26, -26, 26], scale: [1.08, 0.9, 1.08], opacity: [0.15, 0.65, 0.15] }}
+              transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
             />
-            {Array.from({ length: 6 }, (_, i) => (
-              <motion.span
-                key={i}
-                aria-hidden="true"
-                className="pointer-events-none absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full bg-cyan"
-                style={{ boxShadow: "0 0 12px 3px rgba(56,211,255,.65)", transform: "translateZ(30px)" }}
-                animate={{
-                  x: [Math.cos((i * Math.PI) / 3) * 72, Math.cos((i * Math.PI) / 3 + Math.PI) * 72],
-                  y: [Math.sin((i * Math.PI) / 3) * 72, Math.sin((i * Math.PI) / 3 + Math.PI) * 72],
-                  opacity: [0.15, 1, 0.15],
-                  scale: [0.6, 1.6, 0.6],
-                }}
-                transition={{ duration: 3.2 + i * 0.3, repeat: Infinity, ease: "easeInOut", delay: i * 0.28 }}
-              />
-            ))}
-            <motion.div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-[5%] rounded-full"
-              style={{ background: "radial-gradient(circle, rgba(56,211,255,.12) 0%, rgba(47,93,250,.07) 32%, transparent 70%)", transform: "translateZ(-48px)" }}
-              animate={{ opacity: [0.35, 0.8, 0.35], scale: [0.9, 1.12, 0.9] }}
-              transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-            />
+            {Array.from({ length: 10 }, (_, i) => {
+              const angle = (i / 10) * Math.PI * 2;
+              const radius = 76 + (i % 3) * 10;
+              return (
+                <motion.span
+                  key={i}
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full bg-cyan"
+                  style={{
+                    boxShadow: "0 0 13px 3px rgba(56,211,255,.72)",
+                    translateZ: i % 2 === 0 ? 46 : -24,
+                  }}
+                  animate={{
+                    x: [Math.cos(angle) * radius, Math.cos(angle + Math.PI) * radius, Math.cos(angle) * radius],
+                    y: [Math.sin(angle) * radius * 0.68, Math.sin(angle + Math.PI) * radius * 0.68, Math.sin(angle) * radius * 0.68],
+                    opacity: [0.08, 1, 0.08],
+                    scale: [0.45, i % 3 === 0 ? 1.8 : 1.2, 0.45],
+                  }}
+                  transition={{ duration: 3.4 + (i % 4) * 0.65, repeat: Infinity, ease: "easeInOut", delay: i * 0.19 }}
+                />
+              );
+            })}
           </>
         )}
+
+        {/* Main diagram floats independently from the orbital planes */}
+        <motion.div
+          className="relative"
+          style={{
+            transformStyle: "preserve-3d",
+            transform: "translateZ(28px)",
+            filter: "drop-shadow(0 22px 28px rgba(10,35,100,.32))",
+          }}
+          animate={reduce ? undefined : { y: [0, -8, 0, 5, 0], scale: [1, 1.025, 1, 1.012, 1] }}
+          transition={reduce ? undefined : { duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <Component />
+        </motion.div>
+
+        {/* A luminous scanner sweeps through the scene like an active interface */}
+        {!reduce && (
+          <motion.div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-[8%] overflow-hidden rounded-[48%]"
+            style={{ transform: "translateZ(58px)", maskImage: "radial-gradient(ellipse, black 35%, transparent 72%)" }}
+          >
+            <motion.div
+              className="absolute inset-x-0 h-[2px]"
+              style={{ background: "linear-gradient(90deg, transparent, rgba(56,211,255,.95), rgba(91,139,255,.7), transparent)", boxShadow: "0 0 18px 4px rgba(56,211,255,.35)" }}
+              animate={{ top: ["8%", "92%", "8%"], opacity: [0, 0.9, 0] }}
+              transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </motion.div>
+        )}
+
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-[3%] rounded-full"
+          style={{
+            transform: "translateZ(-55px)",
+            background: "radial-gradient(circle, rgba(56,211,255,.10) 0%, rgba(47,93,250,.06) 38%, transparent 72%)",
+          }}
+          animate={reduce ? undefined : { opacity: [0.25, 0.75, 0.25], scale: [0.9, 1.13, 0.9] }}
+          transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
+        />
       </motion.div>
     </div>
   );
