@@ -60,16 +60,27 @@ function Agents() {
         {...linePulse(0.6, satellites.length, reduce)}
       />
       {satellites.map((s) => (
-        <motion.line
-          key={`line-${s.key}`}
-          x1={center.x}
-          y1={center.y}
-          x2={s.x}
-          y2={s.y}
-          stroke={`url(#${GRADIENT_ID})`}
-          strokeWidth="1.5"
-          {...linePulse(0.5, s.key, reduce)}
-        />
+        <g key={`signal-${s.key}`}>
+          <motion.line
+            x1={center.x}
+            y1={center.y}
+            x2={s.x}
+            y2={s.y}
+            stroke={`url(#${GRADIENT_ID})`}
+            strokeWidth="1.5"
+            {...linePulse(0.5, s.key, reduce)}
+          />
+          {!reduce && (
+            <circle r="3" fill="#38d3ff" filter="drop-shadow(0 0 4px #38d3ff)">
+              <animateMotion
+                path={`M ${center.x} ${center.y} L ${s.x} ${s.y}`}
+                dur={`${1.8 + s.key * 0.18}s`}
+                begin={`${s.key * 0.22}s`}
+                repeatCount="indefinite"
+              />
+            </circle>
+          )}
+        </g>
       ))}
       {satellites.map((s) => (
         <circle
@@ -126,6 +137,16 @@ function Automation() {
         <g key={i}>
           <circle cx={n.x} cy={n.y} r="16" fill="#0a0e1c" stroke={`url(#${GRADIENT_ID})`} strokeWidth="2" />
           <circle cx={n.x} cy={n.y} r="5" fill={i === nodes.length - 1 ? "#38d3ff" : "#f4f6fb"} />
+          {!reduce && (
+            <circle r="3" fill="#38d3ff" filter="drop-shadow(0 0 4px #38d3ff)">
+              <animateMotion
+                path={`M ${nodes[0].x} ${nodes[0].y} Q ${(nodes[0].x + nodes[1].x) / 2} ${nodes[0].y} ${nodes[1].x} ${nodes[1].y} Q ${(nodes[1].x + nodes[2].x) / 2} ${nodes[1].y} ${nodes[2].x} ${nodes[2].y} Q ${(nodes[2].x + nodes[3].x) / 2} ${nodes[2].y} ${nodes[3].x} ${nodes[3].y}`}
+                dur="4s"
+                begin={`${i * 0.7}s`}
+                repeatCount="indefinite"
+              />
+            </circle>
+          )}
         </g>
       ))}
     </svg>
