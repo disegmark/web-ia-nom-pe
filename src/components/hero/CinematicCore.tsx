@@ -8,7 +8,6 @@ import { motion, useReducedMotion } from "framer-motion";
  */
 export function CinematicCore() {
   const reduce = useReducedMotion();
-  const duration = reduce ? 0 : 18;
 
   return (
     <div className="cinematic-core relative mx-auto aspect-square w-full max-w-[430px]" aria-hidden="true">
