@@ -1,0 +1,91 @@
+name: Build and browser smoke test
+
+on:
+  push:
+    branches:
+      - master
+      - chore/ci-browser-validation
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Build production app
+        run: npm run build
+
+      - name: Install Chromium for smoke test
+        run: npx playwright install --with-deps chromium
+
+      - name: Start production server
+        run: |
+          npm run start > /tmp/ia-next-server.log 2>&1 &
+          echo $! > /tmp/ia-next-server.pid
+
+      - name: Wait for app to respond
+        run: |
+          for attempt in $(seq 1 40); do
+            if curl --fail --silent http://127.0.0.1:3000/ > /dev/null; then
+              exit 0
+            fi
+            sleep 3
+          done
+          cat /tmp/ia-next-server.log
+          exit 1
+
+      - name: Check page in Chromium and save screenshot
+        run: |
+          npm install --no-save playwright
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright';
+          const browser = await chromium.launch({ headless: true });
+          const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+          const errors = [];
+          page.on('pageerror', error => errors.push(error.message));
+          const response = await page.goto('http://127.0.0.1:3000/', { waitUntil: 'networkidle', timeout: 60000 });
+          if (!response || !response.ok()) throw new Error('Homepage did not return a successful HTTP response');
+          await page.screenshot({ path: 'homepage-mobile.png', fullPage: true });
+          await page.setViewportSize({ width: 1440, height: 1000 });
+          await page.screenshot({ path: 'homepage-desktop.png', fullPage: true });
+          if (errors.length) throw new Error('Browser runtime errors: ' + errors.join(' | '));
+          console.log('Homepage loaded in Chromium; mobile and desktop screenshots captured.');
+          await browser.close();
+          NODE
+
+      - name: Upload browser screenshots and server log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ia-connexion-browser-preview
+          path: |
+            homepage-mobile.png
+            homepage-desktop.png
+            /tmp/ia-next-server.log
+          if-no-files-found: ignore
+          retention-days: 7
