@@ -376,13 +376,44 @@ export function NetworkArt({ variant, className }: { variant: NetworkArtVariant;
           <Component />
         </motion.div>
         {!reduce && (
-          <motion.div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-[8%] rounded-full border border-cyan/10"
-            style={{ transform: "translateZ(-18px) rotateX(68deg) rotateZ(-12deg)" }}
-            animate={{ rotateZ: [-12, 12, -12], scale: [0.96, 1.04, 0.96], opacity: [0.25, 0.65, 0.25] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          />
+          <>
+            <motion.div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-[8%] rounded-full border border-cyan/20"
+              style={{ transform: "translateZ(-18px) rotateX(68deg) rotateZ(-12deg)", boxShadow: "0 0 30px rgba(56,211,255,.08), inset 0 0 24px rgba(47,93,250,.08)" }}
+              animate={{ rotateZ: [-12, 12, -12], scale: [0.92, 1.08, 0.92], opacity: [0.25, 0.85, 0.25] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-[18%] rounded-full border border-blue-500/20"
+              style={{ transform: "translateZ(24px) rotateX(72deg) rotateZ(22deg)" }}
+              animate={{ rotateZ: [22, -22, 22], scale: [1.08, 0.9, 1.08], opacity: [0.15, 0.65, 0.15] }}
+              transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+            />
+            {Array.from({ length: 6 }, (_, i) => (
+              <motion.span
+                key={i}
+                aria-hidden="true"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full bg-cyan"
+                style={{ boxShadow: "0 0 12px 3px rgba(56,211,255,.65)", transform: "translateZ(30px)" }}
+                animate={{
+                  x: [Math.cos((i * Math.PI) / 3) * 72, Math.cos((i * Math.PI) / 3 + Math.PI) * 72],
+                  y: [Math.sin((i * Math.PI) / 3) * 72, Math.sin((i * Math.PI) / 3 + Math.PI) * 72],
+                  opacity: [0.15, 1, 0.15],
+                  scale: [0.6, 1.6, 0.6],
+                }}
+                transition={{ duration: 3.2 + i * 0.3, repeat: Infinity, ease: "easeInOut", delay: i * 0.28 }}
+              />
+            ))}
+            <motion.div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-[5%] rounded-full"
+              style={{ background: "radial-gradient(circle, rgba(56,211,255,.12) 0%, rgba(47,93,250,.07) 32%, transparent 70%)", transform: "translateZ(-48px)" }}
+              animate={{ opacity: [0.35, 0.8, 0.35], scale: [0.9, 1.12, 0.9] }}
+              transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </>
         )}
       </motion.div>
     </div>
