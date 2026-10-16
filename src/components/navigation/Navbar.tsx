@@ -19,7 +19,7 @@ export function Navbar() {
       <Container className="flex items-center justify-between py-4">
         <Logo />
 
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Navegación principal">
+        <nav className="hidden items-center gap-6 lg:flex xl:gap-8" aria-label="Navegación principal">
           {NAV_LINKS.map((link) => {
             const active = pathname === link.href;
             return (
@@ -38,7 +38,7 @@ export function Navbar() {
           })}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden lg:block">
           <ButtonLink href="/contacto" variant="primary" className="px-5 py-2.5 text-sm">
             Conversemos
           </ButtonLink>
@@ -46,7 +46,7 @@ export function Navbar() {
 
         <button
           type="button"
-          className="focus-ring inline-flex items-center justify-center rounded-full p-2 text-foreground md:hidden"
+          className="focus-ring inline-flex items-center justify-center rounded-full p-2 text-foreground lg:hidden"
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? "Cerrar menú" : "Abrir menú"}
@@ -60,7 +60,7 @@ export function Navbar() {
         <nav
           id="mobile-menu"
           aria-label="Navegación móvil"
-          className="border-t border-border bg-background md:hidden"
+          className="border-t border-border bg-background lg:hidden"
         >
           <Container className="flex flex-col gap-1 py-4">
             {NAV_LINKS.map((link) => (
