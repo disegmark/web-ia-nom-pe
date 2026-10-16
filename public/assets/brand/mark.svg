@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" role="img" aria-labelledby="ianompeMarkTitle">
+  <title id="ianompeMarkTitle">ia.nom.pe — símbolo de marca</title>
+  <defs>
+    <linearGradient id="ianompe-ring-gradient" x1="30" y1="170" x2="170" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2f5dfa" />
+      <stop offset="1" stop-color="#38d3ff" />
+    </linearGradient>
+    <linearGradient id="ianompe-band-gradient" x1="120" y1="90" x2="175" y2="90" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5b8bff" />
+      <stop offset="1" stop-color="#c8e8ff" />
+    </linearGradient>
+  </defs>
+
+  <circle
+    cx="100" cy="100" r="80"
+    stroke="#f4f6fb" stroke-width="7" stroke-linecap="round"
+    stroke-dasharray="377 126"
+    transform="rotate(60 100 100)"
+  />
+
+  <circle
+    cx="100" cy="100" r="62"
+    stroke="url(#ianompe-ring-gradient)" stroke-width="7" stroke-linecap="round"
+    stroke-dasharray="292 97"
+    transform="rotate(60 100 100)"
+  />
+
+  <circle cx="175" cy="73" r="13" fill="#2f5dfa" />
+  <circle cx="144" cy="144" r="10" fill="#f4f6fb" />
+
+  <path
+    fill-rule="evenodd" clip-rule="evenodd"
+    fill="#f4f6fb"
+    d="M70 66H86V134H70V66Z"
+  />
+
+  <g clip-path="url(#ianompe-a-clip)">
+    <path
+      fill-rule="evenodd" clip-rule="evenodd"
+      fill="#f4f6fb"
+      d="M141 64L177 134H159L141 98L123 134H105L141 64Z"
+    />
+    <rect x="118" y="88" width="60" height="14" fill="url(#ianompe-band-gradient)" />
+  </g>
+  <clipPath id="ianompe-a-clip">
+    <path d="M141 64L177 134H159L141 98L123 134H105L141 64Z" />
+  </clipPath>
+</svg>
