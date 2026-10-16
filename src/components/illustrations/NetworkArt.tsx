@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import { useId } from "react";
 
 const GRADIENT_ID = "network-art-gradient";
 
@@ -338,9 +339,52 @@ export type NetworkArtVariant = keyof typeof VARIANTS;
 
 export function NetworkArt({ variant, className }: { variant: NetworkArtVariant; className?: string }) {
   const Component = VARIANTS[variant];
+  const reduce = useReducedMotion();
+  const sceneId = useId().replace(/:/g, "");
+  const sceneMotion = reduce
+    ? {}
+    : {
+        animate: {
+          rotateX: [0, 3.5, 0, -3.5, 0],
+          rotateY: [0, -5, 0, 5, 0],
+          rotateZ: [0, 0.8, 0, -0.8, 0],
+          y: [0, -7, 0, 5, 0],
+          scale: [1, 1.025, 1, 1.015, 1],
+        },
+        transition: { duration: 11, repeat: Infinity, ease: "easeInOut" as const },
+      };
+
   return (
     <div className={className}>
-      <Component />
+      <motion.div
+        {...sceneMotion}
+        data-scene={sceneId}
+        style={{ perspective: 1000, transformStyle: "preserve-3d", willChange: reduce ? "auto" : "transform" }}
+        className="relative isolate mx-auto"
+      >
+        <div
+          className="pointer-events-none absolute inset-[12%] -z-10 rounded-full bg-cyan/10 blur-3xl"
+          style={{ transform: "translateZ(-36px) scale(1.15)" }}
+          aria-hidden="true"
+        />
+        <motion.div
+          className="relative"
+          style={{ transformStyle: "preserve-3d", filter: "drop-shadow(0 18px 22px rgba(10,35,100,.22))" }}
+          animate={reduce ? undefined : { z: [0, 14, 0, -5, 0] }}
+          transition={reduce ? undefined : { duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+        >
+          <Component />
+        </motion.div>
+        {!reduce && (
+          <motion.div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-[8%] rounded-full border border-cyan/10"
+            style={{ transform: "translateZ(-18px) rotateX(68deg) rotateZ(-12deg)" }}
+            animate={{ rotateZ: [-12, 12, -12], scale: [0.96, 1.04, 0.96], opacity: [0.25, 0.65, 0.25] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+        )}
+      </motion.div>
     </div>
   );
 }
