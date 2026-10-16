@@ -23,7 +23,7 @@ export function Hero() {
               </span>
             </div>
 
-            <div className="hero-logo-wrap mb-2">
+            <div className="hero-logo-wrap mb-2 lg:hidden">
               <LogoAnimation />
             </div>
 
