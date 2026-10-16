@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Bot, CheckCircle2, Database, MessageCircle, Workflow, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, ArrowRight, Bot, Database, MessageCircle, Workflow, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const GOALS = [
@@ -28,6 +29,7 @@ const SCALE = [
 ];
 
 export function SolutionFinder() {
+  const router = useRouter();
   const [goal, setGoal] = useState("");
   const [systems, setSystems] = useState<string[]>([]);
   const [scale, setScale] = useState("");
@@ -73,7 +75,7 @@ export function SolutionFinder() {
       `Sistemas: ${systems.length ? SYSTEMS.filter((item) => systems.includes(item.id)).map((item) => item.label).join(", ") : "Por definir"}`,
       `Tamaño de operación: ${SCALE.find((item) => item.id === scale)?.label ?? "Por definir"}`,
     ].join("\n");
-    window.location.href = `/contacto?need=${encodeURIComponent(summary)}`;
+    router.push(`/contacto?need=${encodeURIComponent(summary)}`);
   }
 
   return (

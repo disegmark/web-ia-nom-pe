@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Check, CirclePlay, Clock3, Database, Mail, MessageSquareText, Workflow, Zap } from "lucide-react";
+import { ArrowRight, Check, Clock3, Database, Mail, MessageSquareText, Workflow, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const DEMOS = [

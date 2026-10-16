@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 
 type Status = "idle" | "loading" | "success" | "error";
@@ -12,12 +12,16 @@ const LABEL_CLASSES = "text-sm font-medium text-foreground";
 
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
-  const [initialMessage, setInitialMessage] = useState("");
+  const messageRef = useRef<HTMLTextAreaElement>(null);
 
+  // Prefill from the Solution Finder's ?need= link after mount, writing the DOM
+  // value directly — a `defaultValue` set from state here wouldn't re-apply once
+  // the uncontrolled textarea has already mounted.
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const need = params.get("need");
-    if (need) setInitialMessage(need.slice(0, 2000));
+    const need = new URLSearchParams(window.location.search).get("need");
+    if (need && messageRef.current) {
+      messageRef.current.value = need.slice(0, 2000);
+    }
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -117,9 +121,9 @@ export function ContactForm() {
         <textarea
           id="message"
           name="message"
+          ref={messageRef}
           required
           rows={5}
-          defaultValue={initialMessage}
           className={INPUT_CLASSES}
         />
       </div>
