@@ -17,22 +17,27 @@ export function AutomationSection() {
           <Reveal delay={0.1} className="flex justify-center lg:block">
             <NetworkArt variant="automation" className="mx-auto w-full max-w-[220px] sm:max-w-xs lg:max-w-sm text-border" />
           </Reveal>
-          <SectionHeader
-            title="Automatizamos lo repetitivo"
-            description="La automatización permite que los equipos dediquen menos tiempo a tareas repetitivas y más tiempo a actividades estratégicas."
-            className="max-w-none"
-          />
+          <Reveal>
+            <SectionHeader
+              title="Automatizamos lo repetitivo"
+              description="La automatización permite que los equipos dediquen menos tiempo a tareas repetitivas y más tiempo a actividades estratégicas."
+              className="max-w-none"
+            />
+          </Reveal>
         </div>
-        <AutomationPlayground />
+        <Reveal delay={0.08} y={24}>
+          <AutomationPlayground />
+        </Reveal>
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {AUTOMATION_EXAMPLES.map((example, index) => (
-            <FeatureCard
-              key={example.title}
-              title={example.title}
-              description={example.description}
-              delay={index * 0.04}
-              accent={ACCENTS[index % ACCENTS.length]}
-            />
+            <Reveal key={example.title} delay={index * 0.07} y={18}>
+              <FeatureCard
+                title={example.title}
+                description={example.description}
+                delay={0}
+                accent={ACCENTS[index % ACCENTS.length]}
+              />
+            </Reveal>
           ))}
         </div>
       </Container>
