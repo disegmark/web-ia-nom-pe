@@ -5,14 +5,13 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
 import { WHATWEDO_LEFT_NODES, WHATWEDO_RIGHT_NODES } from "@/data/diagrams";
+import { FOCAL, TAU, hexToRgb, makeStars, quad, rotate, shortestAngle, type Pt, type Vec3 } from "./orbit3d";
 
 const NODES = [...WHATWEDO_LEFT_NODES, ...WHATWEDO_RIGHT_NODES];
 const NODE_COLORS = ["#38d3ff", "#5b8bff", "#ffb648", "#38d3ff", "#ffb648"];
 const NODE_Y = [-0.26, 0.14, 0.3, -0.16, 0.22];
 const THETA = NODES.map((_, i) => (i * Math.PI * 2) / NODES.length);
 
-const TAU = Math.PI * 2;
-const FOCAL = 3.2;
 // Steep enough that the front node drops clearly below the core instead of covering it;
 // steeper still on narrow screens so the labels spread vertically instead of crowding the core.
 const BASE_TILT = -0.78;
@@ -25,8 +24,6 @@ const TAP_SLOP_PX = 5;
 const PHASE_MS = 750;
 const AMBIENT_PULSE_MS = 6500;
 
-type Vec3 = { x: number; y: number; z: number };
-type Pt = { x: number; y: number; z: number; s: number };
 type Pulse = { source: number; start: number }; // source -1 = the iA core
 
 const NODE_POS: Vec3[] = NODES.map((_, i) => ({ x: Math.cos(THETA[i]), y: NODE_Y[i], z: Math.sin(THETA[i]) }));
@@ -56,30 +53,6 @@ const PAIRS = NODE_POS.flatMap((a, i) =>
     return { a: i, b: j, control };
   }),
 );
-
-function rotate(p: Vec3, rotY: number, tilt: number): Vec3 {
-  const cr = Math.cos(rotY);
-  const sr = Math.sin(rotY);
-  const x = p.x * cr + p.z * sr;
-  const z = -p.x * sr + p.z * cr;
-  const ct = Math.cos(tilt);
-  const st = Math.sin(tilt);
-  return { x, y: p.y * ct - z * st, z: p.y * st + z * ct };
-}
-
-function quad(p0: Pt, c: Pt, p1: Pt, u: number) {
-  const v = 1 - u;
-  return { x: v * v * p0.x + 2 * v * u * c.x + u * u * p1.x, y: v * v * p0.y + 2 * v * u * c.y + u * u * p1.y };
-}
-
-function shortestAngle(from: number, to: number) {
-  return ((((to - from + Math.PI) % TAU) + TAU) % TAU) - Math.PI;
-}
-
-function hexToRgb(hex: string) {
-  const n = parseInt(hex.slice(1), 16);
-  return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
-}
 
 const NODE_RGB = NODE_COLORS.map(hexToRgb);
 const CORE_RGB = "143, 242, 255";
@@ -125,13 +98,7 @@ export function WhatWeDoHub() {
     const ctx = canvas?.getContext("2d");
     if (!stage || !canvas || !ctx) return;
 
-    const stars = Array.from({ length: 64 }, () => {
-      const u = Math.random() * 2 - 1;
-      const phi = Math.random() * TAU;
-      const r = 1.25 + Math.random() * 0.45;
-      const s = Math.sqrt(1 - u * u);
-      return { x: Math.cos(phi) * s * r, y: u * r * 0.7, z: Math.sin(phi) * s * r, tw: Math.random() * TAU };
-    });
+    const stars = makeStars(64);
     const ring = Array.from({ length: 97 }, (_, k) => {
       const a = (k / 96) * TAU;
       return { x: Math.cos(a), y: 0, z: Math.sin(a) };
