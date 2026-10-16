@@ -8,6 +8,8 @@ import { KnowledgeSection } from "@/components/sections/KnowledgeSection";
 import { SolutionsSection } from "@/components/sections/SolutionsSection";
 import { IndustriesSection } from "@/components/sections/IndustriesSection";
 import { WorkflowSection } from "@/components/sections/WorkflowSection";
+import { OutcomesSection } from "@/components/sections/OutcomesSection";
+import { SolutionFinder } from "@/components/sections/SolutionFinder";
 
 export default function Home() {
   return (
@@ -20,7 +22,9 @@ export default function Home() {
       <IntegrationsSection />
       <KnowledgeSection />
       <SolutionsSection />
+      <SolutionFinder />
       <IndustriesSection />
+      <OutcomesSection />
       <WorkflowSection />
     </>
   );
