@@ -1,7 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeader } from "./SectionHeader";
 import { FeatureCard } from "@/components/cards/FeatureCard";
-import { NetworkArt } from "@/components/illustrations/NetworkArt";
+import { AutomationFlow3D } from "@/components/illustrations/AutomationFlow3D";
 import { Reveal } from "@/components/animations/Reveal";
 import type { SignAccent } from "@/components/signage/Signage";
 import { AUTOMATION_EXAMPLES } from "@/data/automation-examples";
@@ -13,18 +13,15 @@ export function AutomationSection() {
   return (
     <section className="border-t border-border py-20 sm:py-28">
       <Container>
-        <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-          <Reveal delay={0.1} className="flex justify-center lg:block">
-            <NetworkArt variant="automation" className="mx-auto w-full max-w-[300px] sm:max-w-sm lg:max-w-md text-border" />
-          </Reveal>
-          <Reveal>
-            <SectionHeader
-              title="Automatizamos lo repetitivo"
-              description="La automatización permite que los equipos dediquen menos tiempo a tareas repetitivas y más tiempo a actividades estratégicas."
-              className="max-w-none"
-            />
-          </Reveal>
-        </div>
+        <Reveal>
+          <SectionHeader
+            title="Automatizamos lo repetitivo"
+            description="La automatización permite que los equipos dediquen menos tiempo a tareas repetitivas y más tiempo a actividades estratégicas."
+          />
+        </Reveal>
+        <Reveal delay={0.1} className="mt-8">
+          <AutomationFlow3D />
+        </Reveal>
         <Reveal delay={0.08} y={24}>
           <AutomationPlayground />
         </Reveal>

@@ -271,9 +271,13 @@ body {
 .focus-ring {
   outline: none;
 }
+/* Only elements without their own radius get the 4px corner; forcing it on everything
+   turned round controls (the 3D scene cores, pills) square while focused. */
 .focus-ring:focus-visible {
   outline: 2px solid var(--cyan);
   outline-offset: 3px;
+}
+.focus-ring:not([class*="rounded"]):focus-visible {
   border-radius: 4px;
 }
 
