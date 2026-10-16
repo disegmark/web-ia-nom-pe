@@ -13,7 +13,11 @@ const THETA = NODES.map((_, i) => (i * Math.PI * 2) / NODES.length);
 
 const TAU = Math.PI * 2;
 const FOCAL = 3.2;
-const BASE_TILT = -0.4;
+// Steep enough that the front node drops clearly below the core instead of covering it;
+// steeper still on narrow screens so the labels spread vertically instead of crowding the core.
+const BASE_TILT = -0.78;
+const COMPACT_TILT = -1;
+const COMPACT_WIDTH = 480;
 const AUTO_SPEED = 0.14;
 const RESUME_AFTER_MS = 5200;
 const DRAG_GAIN = 0.0065;
@@ -52,6 +56,7 @@ export function WhatWeDoHub() {
   const activeRef = useRef(0);
   const rotRef = useRef({ value: THETA[0] - Math.PI / 2, target: null as number | null, velocity: 0 });
   const tiltRef = useRef({ value: BASE_TILT, target: BASE_TILT });
+  const baseTiltRef = useRef(BASE_TILT);
   const focusUntilRef = useRef(0);
   const hoverRef = useRef(false);
   const dragRef = useRef({ active: false, lastX: 0, lastT: 0, velocity: 0 });
@@ -98,6 +103,9 @@ export function WhatWeDoHub() {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
+      const baseTilt = width < COMPACT_WIDTH ? COMPACT_TILT : BASE_TILT;
+      baseTiltRef.current = baseTilt;
+      tiltRef.current.target = baseTilt;
     };
     resize();
     const resizeObserver = new ResizeObserver(resize);
@@ -107,7 +115,8 @@ export function WhatWeDoHub() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, width, height);
 
-      const R = Math.min(width * 0.38, height * 0.44);
+      const compact = width < COMPACT_WIDTH;
+      const R = Math.min(width * (compact ? 0.33 : 0.4), height * 0.4);
       const cx = width / 2;
       const cy = height / 2;
       const rot = rotRef.current.value;
@@ -206,8 +215,8 @@ export function WhatWeDoHub() {
 
         const el = buttonRefs.current[i];
         if (el) {
-          el.style.transform = `translate3d(${p.x}px, ${p.y}px, 0) translate(-50%, -50%) scale(${0.8 + 0.3 * front})`;
-          el.style.opacity = String(0.42 + 0.58 * front);
+          el.style.transform = `translate3d(${p.x}px, ${p.y}px, 0) translate(-50%, -50%) scale(${compact ? 0.7 + 0.26 * front : 0.8 + 0.3 * front})`;
+          el.style.opacity = String(0.58 + 0.42 * front);
           el.style.zIndex = p.z > 0 ? "30" : "10";
         }
       }
@@ -303,7 +312,7 @@ export function WhatWeDoHub() {
     if (reduce || event.pointerType !== "mouse") return;
     const rect = event.currentTarget.getBoundingClientRect();
     const ny = (event.clientY - rect.top) / rect.height - 0.5;
-    tiltRef.current.target = BASE_TILT - ny * 0.22;
+    tiltRef.current.target = baseTiltRef.current - ny * 0.22;
   }
 
   const activeNode = NODES[active];
@@ -318,7 +327,7 @@ export function WhatWeDoHub() {
         }}
         onPointerLeave={() => {
           hoverRef.current = false;
-          tiltRef.current.target = BASE_TILT;
+          tiltRef.current.target = baseTiltRef.current;
         }}
         onPointerMove={handleStageMove}
       >
@@ -352,14 +361,14 @@ export function WhatWeDoHub() {
               aria-pressed={isActive}
               aria-label={`${node.title}: ${node.description}`}
               className={cn(
-                "focus-ring absolute left-0 top-0 flex items-center gap-2 whitespace-nowrap rounded-xl border px-3 py-2 text-left opacity-0 transition-[border-color,color,background-color,box-shadow] duration-200",
+                "focus-ring absolute left-0 top-0 flex items-center gap-1.5 whitespace-nowrap rounded-xl border px-2.5 py-1.5 text-left opacity-0 sm:gap-2 sm:px-3 sm:py-2 transition-[border-color,color,background-color,box-shadow] duration-200",
                 isActive
                   ? "border-cyan/60 bg-background-elevated text-cyan shadow-[0_0_26px_-8px_rgba(56,211,255,.6)]"
                   : "border-border bg-background-elevated/90 text-muted hover:border-cyan/35 hover:text-foreground",
               )}
             >
-              <Icon name={node.icon} className="h-4 w-4 shrink-0" />
-              <span className="text-xs font-medium leading-tight">{node.title}</span>
+              <Icon name={node.icon} className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+              <span className="text-[11px] font-medium leading-tight sm:text-xs">{node.title}</span>
             </button>
           );
         })}
