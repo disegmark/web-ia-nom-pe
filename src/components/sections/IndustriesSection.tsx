@@ -14,7 +14,7 @@ export function IndustriesSection() {
       <Container>
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <Reveal delay={0.1} className="flex justify-center lg:block">
-            <NetworkArt variant="industries" className="mx-auto w-full max-w-[220px] sm:max-w-xs lg:max-w-sm text-border" />
+            <NetworkArt variant="industries" className="mx-auto w-full max-w-[300px] sm:max-w-sm lg:max-w-md text-border" />
           </Reveal>
           <Reveal>
             <SectionHeader

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import { useId } from "react";
 
 const GRADIENT_ID = "network-art-gradient";
 
@@ -60,16 +61,27 @@ function Agents() {
         {...linePulse(0.6, satellites.length, reduce)}
       />
       {satellites.map((s) => (
-        <motion.line
-          key={`line-${s.key}`}
-          x1={center.x}
-          y1={center.y}
-          x2={s.x}
-          y2={s.y}
-          stroke={`url(#${GRADIENT_ID})`}
-          strokeWidth="1.5"
-          {...linePulse(0.5, s.key, reduce)}
-        />
+        <g key={`signal-${s.key}`}>
+          <motion.line
+            x1={center.x}
+            y1={center.y}
+            x2={s.x}
+            y2={s.y}
+            stroke={`url(#${GRADIENT_ID})`}
+            strokeWidth="1.5"
+            {...linePulse(0.5, s.key, reduce)}
+          />
+          {!reduce && (
+            <circle r="3" fill="#38d3ff" filter="drop-shadow(0 0 4px #38d3ff)">
+              <animateMotion
+                path={`M ${center.x} ${center.y} L ${s.x} ${s.y}`}
+                dur={`${1.8 + s.key * 0.18}s`}
+                begin={`${s.key * 0.22}s`}
+                repeatCount="indefinite"
+              />
+            </circle>
+          )}
+        </g>
       ))}
       {satellites.map((s) => (
         <circle
@@ -126,6 +138,16 @@ function Automation() {
         <g key={i}>
           <circle cx={n.x} cy={n.y} r="16" fill="#0a0e1c" stroke={`url(#${GRADIENT_ID})`} strokeWidth="2" />
           <circle cx={n.x} cy={n.y} r="5" fill={i === nodes.length - 1 ? "#38d3ff" : "#f4f6fb"} />
+          {!reduce && (
+            <circle r="3" fill="#38d3ff" filter="drop-shadow(0 0 4px #38d3ff)">
+              <animateMotion
+                path={`M ${nodes[0].x} ${nodes[0].y} Q ${(nodes[0].x + nodes[1].x) / 2} ${nodes[0].y} ${nodes[1].x} ${nodes[1].y} Q ${(nodes[1].x + nodes[2].x) / 2} ${nodes[1].y} ${nodes[2].x} ${nodes[2].y} Q ${(nodes[2].x + nodes[3].x) / 2} ${nodes[2].y} ${nodes[3].x} ${nodes[3].y}`}
+                dur="4s"
+                begin={`${i * 0.7}s`}
+                repeatCount="indefinite"
+              />
+            </circle>
+          )}
         </g>
       ))}
     </svg>
@@ -317,9 +339,83 @@ export type NetworkArtVariant = keyof typeof VARIANTS;
 
 export function NetworkArt({ variant, className }: { variant: NetworkArtVariant; className?: string }) {
   const Component = VARIANTS[variant];
+  const reduce = useReducedMotion();
+  const sceneId = useId().replace(/:/g, "");
+  const sceneMotion = reduce
+    ? {}
+    : {
+        animate: {
+          rotateX: [0, 3.5, 0, -3.5, 0],
+          rotateY: [0, -5, 0, 5, 0],
+          rotateZ: [0, 0.8, 0, -0.8, 0],
+          y: [0, -7, 0, 5, 0],
+          scale: [1, 1.025, 1, 1.015, 1],
+        },
+        transition: { duration: 11, repeat: Infinity, ease: "easeInOut" as const },
+      };
+
   return (
     <div className={className}>
-      <Component />
+      <motion.div
+        {...sceneMotion}
+        data-scene={sceneId}
+        style={{ perspective: 1000, transformStyle: "preserve-3d", willChange: reduce ? "auto" : "transform" }}
+        className="relative isolate mx-auto"
+      >
+        <div
+          className="pointer-events-none absolute inset-[12%] -z-10 rounded-full bg-cyan/10 blur-3xl"
+          style={{ transform: "translateZ(-36px) scale(1.15)" }}
+          aria-hidden="true"
+        />
+        <motion.div
+          className="relative"
+          style={{ transformStyle: "preserve-3d", filter: "drop-shadow(0 18px 22px rgba(10,35,100,.22))" }}
+          animate={reduce ? undefined : { z: [0, 14, 0, -5, 0] }}
+          transition={reduce ? undefined : { duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+        >
+          <Component />
+        </motion.div>
+        {!reduce && (
+          <>
+            <motion.div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-[8%] rounded-full border border-cyan/20"
+              style={{ transform: "translateZ(-18px) rotateX(68deg) rotateZ(-12deg)", boxShadow: "0 0 30px rgba(56,211,255,.08), inset 0 0 24px rgba(47,93,250,.08)" }}
+              animate={{ rotateZ: [-12, 12, -12], scale: [0.92, 1.08, 0.92], opacity: [0.25, 0.85, 0.25] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-[18%] rounded-full border border-blue-500/20"
+              style={{ transform: "translateZ(24px) rotateX(72deg) rotateZ(22deg)" }}
+              animate={{ rotateZ: [22, -22, 22], scale: [1.08, 0.9, 1.08], opacity: [0.15, 0.65, 0.15] }}
+              transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+            />
+            {Array.from({ length: 6 }, (_, i) => (
+              <motion.span
+                key={i}
+                aria-hidden="true"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full bg-cyan"
+                style={{ boxShadow: "0 0 12px 3px rgba(56,211,255,.65)", transform: "translateZ(30px)" }}
+                animate={{
+                  x: [Math.cos((i * Math.PI) / 3) * 72, Math.cos((i * Math.PI) / 3 + Math.PI) * 72],
+                  y: [Math.sin((i * Math.PI) / 3) * 72, Math.sin((i * Math.PI) / 3 + Math.PI) * 72],
+                  opacity: [0.15, 1, 0.15],
+                  scale: [0.6, 1.6, 0.6],
+                }}
+                transition={{ duration: 3.2 + i * 0.3, repeat: Infinity, ease: "easeInOut", delay: i * 0.28 }}
+              />
+            ))}
+            <motion.div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-[5%] rounded-full"
+              style={{ background: "radial-gradient(circle, rgba(56,211,255,.12) 0%, rgba(47,93,250,.07) 32%, transparent 70%)", transform: "translateZ(-48px)" }}
+              animate={{ opacity: [0.35, 0.8, 0.35], scale: [0.9, 1.12, 0.9] }}
+              transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </>
+        )}
+      </motion.div>
     </div>
   );
 }

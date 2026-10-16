@@ -22,7 +22,7 @@ export function IntegrationsSection() {
             />
           </Reveal>
           <Reveal delay={0.1} className="flex justify-center lg:block">
-            <NetworkArt variant="integrations" className="mx-auto w-full max-w-[220px] sm:max-w-xs lg:max-w-sm text-border" />
+            <NetworkArt variant="integrations" className="mx-auto w-full max-w-[300px] sm:max-w-sm lg:max-w-md text-border" />
           </Reveal>
         </div>
 
