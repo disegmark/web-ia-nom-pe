@@ -76,15 +76,3 @@ export const WHATWEDO_RIGHT_NODES: IconItem[] = [
   { title: "Procesos", description: "Flujos de trabajo y reglas de negocio.", icon: "process" },
   { title: "Automatizaciones", description: "IA, APIs e integraciones.", icon: "automation" },
 ];
-
-export const WHATWEDO_TOP_ROW: IconItem[] = [
-  { title: "Personas", description: "Interacción humana + IA", icon: "person" },
-  { title: "Datos", description: "Información estructurada y no estructurada", icon: "database" },
-  { title: "Herramientas", description: "Aplicaciones, APIs y servicios externos", icon: "tools" },
-];
-
-export const WHATWEDO_BOTTOM_ROW: IconItem[] = [
-  { title: "Agentes", description: "Analizan · Deciden · Ejecutan", icon: "brain" },
-  { title: "Automatización", description: "Conecta · Orquesta · Optimiza", icon: "automation" },
-  { title: "Resultados", description: "Más eficiencia · Menos tiempo · Mayor valor", icon: "target" },
-];

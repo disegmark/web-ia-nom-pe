@@ -366,3 +366,13 @@ body {
 .photo-sweep {
   animation: photo-sweep 9s ease-in-out infinite;
 }
+
+/* Signal running along the top edge of the connectivity plate. */
+@keyframes signal-run {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+.signal-run { animation: signal-run 5s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .signal-run, .photo-sweep { animation: none; }
+}
