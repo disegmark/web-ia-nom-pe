@@ -4,14 +4,15 @@ import { ArrowRight } from "lucide-react";
 import { PageHero } from "@/components/sections/PageHero";
 import { Container } from "@/components/ui/Container";
 import { SectionHeader } from "@/components/sections/SectionHeader";
-import { IndustryCard } from "@/components/cards/IndustryCard";
+import { SolutionFinder } from "@/components/sections/SolutionFinder";
+import { IndustriesSection } from "@/components/sections/IndustriesSection";
 import { FAQ } from "@/components/sections/FAQ";
 import { CTA } from "@/components/sections/CTA";
-import { NetworkArt } from "@/components/illustrations/NetworkArt";
 import { Reveal } from "@/components/animations/Reveal";
-import { INDUSTRIES } from "@/data/industries";
+import { PLATE_GLOW, TEXT_GLOW, type SignAccent } from "@/components/signage/Signage";
 import { FAQS } from "@/data/faqs";
 import { pageMetadata } from "@/lib/seo";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = pageMetadata({
   title: "Soluciones",
@@ -43,6 +44,8 @@ const PILLARS = [
   },
 ];
 
+const ACCENTS: SignAccent[] = ["cyan", "amber", "signal"];
+
 export default function SolucionesPage() {
   return (
     <>
@@ -54,49 +57,37 @@ export default function SolucionesPage() {
 
       <section className="py-20 sm:py-28">
         <Container>
-          <SectionHeader eyebrow="Cuatro frentes" title="Cómo se compone una solución" />
+          <Reveal>
+            <SectionHeader eyebrow="Cuatro frentes" title="Cómo se compone una solución" />
+          </Reveal>
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {PILLARS.map((pillar, index) => (
-              <Reveal key={pillar.href} delay={index * 0.05} className="h-full">
-                <Link
-                  href={pillar.href}
-                  className="focus-ring group flex h-full flex-col justify-between rounded-2xl border border-border bg-background-elevated p-6 transition-colors hover:border-cyan/40"
-                >
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground">{pillar.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted">{pillar.description}</p>
-                  </div>
-                  <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-cyan">
-                    Ver más
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                  </span>
-                </Link>
-              </Reveal>
-            ))}
+            {PILLARS.map((pillar, index) => {
+              const accent = ACCENTS[index % ACCENTS.length];
+              return (
+                <Reveal key={pillar.href} delay={index * 0.05} className="h-full">
+                  <Link
+                    href={pillar.href}
+                    className={cn("plate focus-ring group flex h-full flex-col justify-between p-6", PLATE_GLOW[accent])}
+                  >
+                    <div>
+                      <h3 className="font-display text-lg font-semibold text-foreground">{pillar.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-muted">{pillar.description}</p>
+                    </div>
+                    <span className={cn("mt-6 inline-flex items-center gap-1.5 text-sm font-medium", TEXT_GLOW[accent])}>
+                      Ver más
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                  </Link>
+                </Reveal>
+              );
+            })}
           </div>
         </Container>
       </section>
 
-      <section className="border-t border-border py-20 sm:py-28">
-        <Container>
-          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-            <Reveal delay={0.1} className="flex justify-center lg:block">
-              <NetworkArt variant="industries" className="mx-auto w-full max-w-[220px] sm:max-w-xs lg:max-w-sm text-border" />
-            </Reveal>
-            <SectionHeader
-              eyebrow="Aplicación"
-              title="¿Dónde puede aplicarse?"
-              description="Ejemplos ilustrativos de dónde suele aplicarse este tipo de tecnología."
-              className="max-w-none"
-            />
-          </div>
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {INDUSTRIES.map((industry, index) => (
-              <IndustryCard key={industry.slug} industry={industry} delay={index * 0.04} />
-            ))}
-          </div>
-        </Container>
-      </section>
+      <SolutionFinder />
+
+      <IndustriesSection />
 
       <section className="border-t border-border py-20 sm:py-28">
         <Container>

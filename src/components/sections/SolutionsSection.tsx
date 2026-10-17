@@ -16,7 +16,7 @@ import { BADGE_BG, PLATE_LIT, SignMarker, type SignAccent } from "@/components/s
 const ROTATE_MS = 3500;
 const ACCENTS: SignAccent[] = ["cyan", "amber", "signal"];
 
-function DifferentiatorStack() {
+export function DifferentiatorStack() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
 

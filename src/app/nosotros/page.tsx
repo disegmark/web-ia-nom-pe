@@ -5,6 +5,7 @@ import { SectionHeader } from "@/components/sections/SectionHeader";
 import { FeatureCard } from "@/components/cards/FeatureCard";
 import { CTA } from "@/components/sections/CTA";
 import { Reveal } from "@/components/animations/Reveal";
+import type { SignAccent } from "@/components/signage/Signage";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
@@ -32,6 +33,8 @@ const VALUES = [
     description: "Diseñamos cada sistema pensando en lo que la empresa necesitará mañana, no solo hoy.",
   },
 ];
+
+const ACCENTS: SignAccent[] = ["cyan", "amber", "signal"];
 
 export default function NosotrosPage() {
   return (
@@ -79,7 +82,13 @@ export default function NosotrosPage() {
           <SectionHeader eyebrow="Cómo trabajamos" title="Lo que no negociamos" align="center" />
           <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {VALUES.map((value, index) => (
-              <FeatureCard key={value.title} title={value.title} description={value.description} delay={index * 0.05} />
+              <FeatureCard
+                key={value.title}
+                title={value.title}
+                description={value.description}
+                delay={index * 0.05}
+                accent={ACCENTS[index % ACCENTS.length]}
+              />
             ))}
           </div>
         </Container>
