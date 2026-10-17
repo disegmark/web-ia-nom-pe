@@ -6,6 +6,7 @@ import { SectionHeader } from "@/components/sections/SectionHeader";
 import { CTA } from "@/components/sections/CTA";
 import { AutomationEcosystem } from "@/components/sections/AutomationEcosystem";
 import { AutomationPlayground } from "@/components/sections/AutomationPlayground";
+import { ImpactSimulator } from "@/components/sections/ImpactSimulator";
 import { Reveal } from "@/components/animations/Reveal";
 import type { SignAccent } from "@/components/signage/Signage";
 import { AUTOMATION_EXAMPLES } from "@/data/automation-examples";
@@ -43,6 +44,9 @@ export default function AutomatizacionPage() {
           </Reveal>
           <Reveal delay={0.08} y={24}>
             <AutomationPlayground />
+          </Reveal>
+          <Reveal delay={0.08} y={24}>
+            <ImpactSimulator />
           </Reveal>
           <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {AUTOMATION_EXAMPLES.map((example, index) => (
