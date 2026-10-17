@@ -6,10 +6,10 @@ type BlogPostInput = Omit<BlogPost, "readingTime">;
 // withheld, and only features those systems actually implement are described.
 const POSTS: BlogPostInput[] = [
   {
-    slug: "seis-sistemas-agenticos-en-produccion",
-    title: "Seis sistemas agénticos en producción: lo que aprendimos por rubro",
+    slug: "sistemas-agenticos-en-produccion-por-rubro",
+    title: "Sistemas agénticos en producción: lo que aprendimos por rubro",
     excerpt:
-      "Consultorios, una clínica, una importadora, una academia, una agencia y una empresa de tecnología. Qué hace cada sistema, qué herramientas usa el agente y qué patrones se repiten.",
+      "Salud, comercio, educación, marketing y servicios tecnológicos. Qué hace cada sistema, qué herramientas usa el agente y qué patrones se repiten.",
     date: "2026-10-16",
     category: "Casos reales",
     tags: ["Casos", "WhatsApp", "Panel de control", "Industrias"],
@@ -22,7 +22,7 @@ const POSTS: BlogPostInput[] = [
       { heading: "Comercio: precios, stock y pedidos en vivo" },
       "Una empresa de importaciones y venta por mayor necesitaba que el agente consultara precios y stock en vivo, creara pedidos que reservan stock y registrara encargos de importación. Los casos complejos escalan a modelos de IA más potentes o a una persona.",
       { heading: "Educación: inscripciones y asesorías" },
-      "En una academia de capacitación, el agente informa sobre los cursos, registra inscripciones con su estado de pago y agenda, reprograma o cancela asesorías conectadas a Google Calendar y Google Meet.",
+      "La misma empresa de comercio tiene también una línea de capacitación, y el mismo agente la cubre: informa sobre los cursos, registra inscripciones con su estado de pago y agenda, reprograma o cancela asesorías conectadas a Google Calendar y Google Meet.",
       { heading: "Marketing y servicios B2B: prospectos calificados" },
       "Para una agencia de marketing, la recepcionista virtual califica prospectos y agenda reuniones, y el panel suma herramientas de IA para estudios de mercado, ideas de anuncios y presentaciones. Para una empresa de servicios tecnológicos, el chatbot de la web responde solo sobre los servicios de la empresa, sin salirse del tema, y deriva a ventas a quienes muestran interés.",
       { heading: "Lo que se repite en todos" },
@@ -42,7 +42,7 @@ const POSTS: BlogPostInput[] = [
     title: "Demo abierto: prueba un sistema agéntico 24/7 sin compromiso",
     excerpt:
       "Publicamos un demo interactivo con un negocio ficticio, Café Aurora: conversa con el agente por chat web o WhatsApp simulado, agenda una reserva y recorre su panel de control.",
-    date: "2026-09-28",
+    date: "2026-10-16",
     category: "Producto",
     tags: ["Demo", "Chat web", "WhatsApp", "Panel de control"],
     cta: { label: "Probar el demo", href: "/demo" },
@@ -69,7 +69,7 @@ const POSTS: BlogPostInput[] = [
     title: "El panel de control: donde el equipo humano toma el mando",
     excerpt:
       "Un agente iA no debería ser una caja negra. Así es el panel que acompaña a cada sistema: conversaciones en tiempo real, toma de control humano, agenda, ventas y reportes.",
-    date: "2026-09-08",
+    date: "2026-10-16",
     category: "Producto",
     tags: ["Panel de control", "Toma de control humano", "Operación"],
     cta: { label: "Ver el panel en el demo", href: "/demo" },
@@ -98,7 +98,7 @@ const POSTS: BlogPostInput[] = [
     title: "Base de conocimiento: un agente que responde con tu información",
     excerpt:
       "Un agente útil no improvisa: consulta documentos, políticas y catálogos de la empresa antes de responder. Así funciona el flujo de conocimiento detrás de cada sistema.",
-    date: "2026-08-18",
+    date: "2026-10-16",
     category: "Fundamentos",
     tags: ["Base de conocimiento", "RAG", "Documentos"],
     cta: { label: "Ver cómo funciona", href: "/agentes-ia" },
@@ -126,7 +126,7 @@ const POSTS: BlogPostInput[] = [
     title: "Salvaguardas: cómo evitamos que un agente prometa lo que no hizo",
     excerpt:
       "Mantenerse en el tema, verificar que cada acción se ejecutó y escalar a tiempo. Las reglas que aplicamos para que un agente sea confiable en producción.",
-    date: "2026-07-27",
+    date: "2026-10-16",
     category: "Guías",
     tags: ["Seguridad", "Calidad", "Escalamiento"],
     cta: { label: "Conversemos sobre tu caso", href: "/contacto" },
@@ -148,12 +148,12 @@ const POSTS: BlogPostInput[] = [
     title: "Marketing con IA dentro del mismo sistema: estudios, carruseles, avatares y catálogos",
     excerpt:
       "El panel de control también sirve para crear: estudios de mercado, ideas de anuncios, carruseles, catálogos virtuales, avatares en vivo y presentaciones generadas con IA.",
-    date: "2026-07-06",
+    date: "2026-10-16",
     category: "Marketing con IA",
     tags: ["Marketing", "Estudio de mercado", "Contenido", "Presentaciones"],
     cta: { label: "Explorar el módulo de marketing", href: "/demo" },
     content: [
-      "Trabajando con una agencia de marketing nos dimos cuenta de algo: el mismo sistema que atiende y califica prospectos puede ayudar a preparar lo que viene después. Así nacieron las herramientas de marketing y oficina integradas en el panel.",
+      "El mismo sistema que atiende y califica prospectos puede ayudar a preparar lo que viene después. Por eso el panel incluye herramientas de marketing y de oficina.",
       { heading: "Herramientas de marketing" },
       {
         list: [
@@ -181,7 +181,7 @@ const POSTS: BlogPostInput[] = [
     title: "Integraciones y automatización: conectar WhatsApp, Calendar, CRM y más",
     excerpt:
       "Un agente aislado no transforma una operación. Cómo conectamos canales, calendarios, hojas de cálculo, CRM, bases de datos y flujos de automatización alrededor del agente.",
-    date: "2026-06-15",
+    date: "2026-10-16",
     category: "Guías",
     tags: ["Integraciones", "Automatización", "n8n", "Google Calendar"],
     cta: { label: "Ver el ecosistema de integraciones", href: "/integraciones" },
@@ -207,7 +207,7 @@ const POSTS: BlogPostInput[] = [
     title: "¿Por dónde empezar? Cómo elegir la solución iA para tu negocio en 4 preguntas",
     excerpt:
       "Rubro, objetivos, canales y herramientas actuales. Las cuatro preguntas con las que orientamos cada proyecto, ahora en un buscador guiado en la web.",
-    date: "2026-05-25",
+    date: "2026-10-16",
     category: "Guías",
     tags: ["Diagnóstico", "Primeros pasos", "Soluciones"],
     cta: { label: "Usar el buscador de soluciones", href: "/#encuentra" },
