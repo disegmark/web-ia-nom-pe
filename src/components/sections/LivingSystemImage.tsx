@@ -149,24 +149,24 @@ export function LivingSystemImage({ className }: { className?: string }) {
             );
           })}
 
-          <div className="absolute left-3 top-3 z-30 w-[58%] sm:left-4 sm:top-4" aria-live="polite">
-            <motion.div
-              key={spot.key}
-              initial={reduce ? false : { opacity: 0, transform: "translateY(8px)" }}
-              animate={{ opacity: 1, transform: "translateY(0px)" }}
-              transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
-              className="plate px-3.5 py-3"
-              style={{ borderColor: `${spot.color}66` }}
-            >
-              <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <span className="h-2 w-2 rounded-full" style={{ background: spot.color, boxShadow: `0 0 10px ${spot.color}` }} aria-hidden="true" />
-                {spot.title}
-              </p>
-              <p className="mt-1 text-xs leading-relaxed text-muted">{spot.copy}</p>
-            </motion.div>
-          </div>
         </div>
       </motion.div>
+    <div className="mt-4" aria-live="polite">
+      <motion.div
+        key={spot.key}
+        initial={reduce ? false : { opacity: 0, transform: "translateY(8px)" }}
+        animate={{ opacity: 1, transform: "translateY(0px)" }}
+        transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+        className="plate max-w-none px-4 py-3"
+        style={{ borderColor: `${spot.color}66` }}
+      >
+        <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+          <span className="h-2 w-2 rounded-full" style={{ background: spot.color, boxShadow: `0 0 10px ${spot.color}` }} aria-hidden="true" />
+          {spot.title}
+        </p>
+        <p className="mt-1 text-xs leading-relaxed text-muted">{spot.copy}</p>
+      </motion.div>
+    </div>
     </div>
   );
 }
