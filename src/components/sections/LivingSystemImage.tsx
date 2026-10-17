@@ -5,21 +5,14 @@ import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as R
 import { motion, useInView, useMotionTemplate, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-// Positions are percentages of the cropped image (816 x 768).
-const SPOTS = [
-  { key: "soporte", x: 48.4, y: 18.9, color: "#ffd36a", title: "Atención al cliente", copy: "Un agente responde consultas y deriva a una persona cuando el caso lo requiere." },
-  { key: "reportes", x: 69.9, y: 34.2, color: "#35ddff", title: "Datos y seguimiento", copy: "La información queda ordenada para que el equipo la revise y tome decisiones." },
-  { key: "herramientas", x: 75.4, y: 59.5, color: "#ff7ab0", title: "Tus herramientas", copy: "Se conecta con las aplicaciones que tu equipo ya usa, dentro de permisos definidos." },
-  { key: "equipo", x: 60.0, y: 78.5, color: "#43f0b2", title: "Trabajo en equipo", copy: "Las personas coordinan con el sistema: la iA prepara, el equipo decide lo sensible." },
-  { key: "servicios", x: 37.7, y: 87.2, color: "#48c9ff", title: "Servicios conectados", copy: "Correo, calendario, archivos, tienda y nube enlazados dentro de un mismo flujo." },
-] as const;
+import { SYSTEM_PRESET, type ImagePreset } from "@/data/living-image";
 
-const CORE = { x: 33.1, y: 49.5 };
 const CYCLE_MS = 4200;
 const HOLD_MS = 10000;
 
 /** Illustration of the connected system, made interactive: tilt + parallax, cursor light, pulsing hotspots with a readout. */
-export function LivingSystemImage({ className }: { className?: string }) {
+export function LivingSystemImage({ className, preset = SYSTEM_PRESET }: { className?: string; preset?: ImagePreset }) {
+  const { spots: SPOTS, core: CORE } = preset;
   const reduce = useReducedMotion();
   const frameRef = useRef<HTMLDivElement>(null);
   const inView = useInView(frameRef, { margin: "-10% 0px" });
@@ -34,8 +27,8 @@ export function LivingSystemImage({ className }: { className?: string }) {
   const py = useMotionValue(0);
   const sx = useSpring(px, { stiffness: 70, damping: 20 });
   const sy = useSpring(py, { stiffness: 70, damping: 20 });
-  const imgX = useTransform(sx, (v) => v * -10);
-  const imgY = useTransform(sy, (v) => v * -8);
+  const imgX = useTransform(sx, (v) => v * -5);
+  const imgY = useTransform(sy, (v) => v * -4);
   const lightX = useMotionValue(50);
   const lightY = useMotionValue(50);
   const light = useMotionTemplate`radial-gradient(360px circle at ${lightX}% ${lightY}%, rgba(56, 211, 255, 0.22), transparent 62%)`;
@@ -49,7 +42,7 @@ export function LivingSystemImage({ className }: { className?: string }) {
       setActive((i) => (i + 1) % SPOTS.length);
     }, CYCLE_MS);
     return () => window.clearInterval(id);
-  }, [reduce, inView]);
+  }, [reduce, inView, SPOTS.length]);
 
   function handleMove(event: ReactPointerEvent<HTMLDivElement>) {
     if (reduce || event.pointerType !== "mouse") return;
@@ -93,14 +86,14 @@ export function LivingSystemImage({ className }: { className?: string }) {
         style={{ rotateX: reduce ? 0 : rotateX, rotateY: reduce ? 0 : rotateY, transformStyle: "preserve-3d" }}
         className="relative overflow-hidden rounded-[28px] bg-background-elevated shadow-[0_40px_90px_-40px_rgba(56,211,255,0.4),0_0_0_1px_rgba(56,211,255,0.14)]"
       >
-        <div className="relative aspect-[816/768] w-full">
-          <motion.div className="absolute inset-0 scale-[1.06]" style={{ x: reduce ? 0 : imgX, y: reduce ? 0 : imgY }}>
+        <div className="relative w-full" style={{ aspectRatio: `${preset.width} / ${preset.height}` }}>
+          <motion.div className="absolute inset-0 scale-[1.025]" style={{ x: reduce ? 0 : imgX, y: reduce ? 0 : imgY }}>
             <Image
-              src="/assets/images/sistema-inteligente.webp"
-              alt="Esfera de luz que representa un sistema de iA conectado con áreas de atención al cliente, análisis de datos, herramientas creativas, trabajo en equipo y servicios en la nube"
-              width={816}
-              height={768}
-              sizes="(min-width: 1024px) 560px, calc(100vw - 3rem)"
+              src={preset.src}
+              alt={preset.alt}
+              width={preset.width}
+              height={preset.height}
+              sizes={preset.sizes}
               quality={82}
               className="h-full w-full object-cover"
             />
@@ -111,13 +104,13 @@ export function LivingSystemImage({ className }: { className?: string }) {
           {/* Energy rings around the core and pulses on the hotspots. */}
           {reduce ? null : (
             <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-              {[0, 1, 2].map((n) => (
+              {CORE ? [0, 1, 2].map((n) => (
                 <span
                   key={n}
                   className="core-pulse absolute rounded-full border border-cyan/60"
                   style={{ left: `${CORE.x}%`, top: `${CORE.y}%`, width: "34%", aspectRatio: "1", animationDelay: `${n * 1.3}s` } as CSSProperties}
                 />
-              ))}
+              )) : null}
               <span className="photo-sweep absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-cyan/15 to-transparent" />
               <motion.div className="absolute inset-0" style={{ background: light, opacity: lightOpacity }} />
             </div>
