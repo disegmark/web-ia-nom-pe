@@ -92,11 +92,20 @@ export type AutomationExample = {
   description: string;
 };
 
+export type BlogCategory = "Casos reales" | "Producto" | "Guías" | "Fundamentos" | "Marketing con IA";
+
+/** A paragraph, a subheading, a bullet list, or a highlighted note. */
+export type BlogBlock = string | { heading: string } | { list: string[] } | { note: string };
+
 export type BlogPost = {
   slug: string;
   title: string;
   excerpt: string;
   date: string;
   readingTime: string;
-  content: string[];
+  category: BlogCategory;
+  tags: string[];
+  /** Where the article points readers next on the site. */
+  cta?: { label: string; href: string };
+  content: BlogBlock[];
 };
