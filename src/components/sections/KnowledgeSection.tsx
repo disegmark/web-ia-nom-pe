@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 const ACCENTS: SignAccent[] = ["cyan", "amber", "signal"];
 
-export function KnowledgeSection() {
+export function KnowledgeSection({ showMoreLink = true }: { showMoreLink?: boolean }) {
   return (
     <section className="border-t border-border py-20 sm:py-28">
       <Container>
@@ -34,7 +34,7 @@ export function KnowledgeSection() {
             <Reveal delay={0.15} className="mt-8">
               <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
                 <ButtonLink href="/contacto" variant="primary">Conecta el conocimiento de tu empresa</ButtonLink>
-                <ButtonLink href="/agentes-ia" variant="ghost">Conoce más</ButtonLink>
+                {showMoreLink ? <ButtonLink href="/agentes-ia" variant="ghost">Conoce más</ButtonLink> : null}
               </div>
             </Reveal>
           </div>

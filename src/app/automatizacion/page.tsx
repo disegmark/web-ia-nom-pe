@@ -4,8 +4,10 @@ import { Container } from "@/components/ui/Container";
 import { FeatureCard } from "@/components/cards/FeatureCard";
 import { SectionHeader } from "@/components/sections/SectionHeader";
 import { CTA } from "@/components/sections/CTA";
-import { NetworkArt } from "@/components/illustrations/NetworkArt";
+import { AutomationEcosystem } from "@/components/sections/AutomationEcosystem";
+import { AutomationPlayground } from "@/components/sections/AutomationPlayground";
 import { Reveal } from "@/components/animations/Reveal";
+import type { SignAccent } from "@/components/signage/Signage";
 import { AUTOMATION_EXAMPLES } from "@/data/automation-examples";
 import { pageMetadata } from "@/lib/seo";
 
@@ -15,6 +17,8 @@ export const metadata: Metadata = pageMetadata({
     "Automatizamos tareas repetitivas — respuestas, seguimiento, generación de leads, procesos administrativos — para que tu equipo dedique tiempo a lo estratégico.",
   path: "/automatizacion",
 });
+
+const ACCENTS: SignAccent[] = ["cyan", "amber", "signal"];
 
 export default function AutomatizacionPage() {
   return (
@@ -27,25 +31,29 @@ export default function AutomatizacionPage() {
 
       <section className="py-20 sm:py-28">
         <Container>
-          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-            <Reveal delay={0.1} className="flex justify-center lg:block">
-              <NetworkArt variant="automation" className="mx-auto w-full max-w-[220px] sm:max-w-xs lg:max-w-sm text-border" />
-            </Reveal>
+          <Reveal>
             <SectionHeader
               eyebrow="Ejemplos"
               title="Procesos que puedes dejar de hacer manualmente"
               description="Estos son ejemplos de tareas que un sistema de agentes y automatizaciones puede absorber dentro de tu operación."
-              className="max-w-none"
             />
-          </div>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <AutomationEcosystem />
+          </Reveal>
+          <Reveal delay={0.08} y={24}>
+            <AutomationPlayground />
+          </Reveal>
           <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {AUTOMATION_EXAMPLES.map((example, index) => (
-              <FeatureCard
-                key={example.title}
-                title={example.title}
-                description={example.description}
-                delay={index * 0.04}
-              />
+              <Reveal key={example.title} delay={index * 0.07} y={18}>
+                <FeatureCard
+                  title={example.title}
+                  description={example.description}
+                  delay={0}
+                  accent={ACCENTS[index % ACCENTS.length]}
+                />
+              </Reveal>
             ))}
           </div>
         </Container>
@@ -53,12 +61,14 @@ export default function AutomatizacionPage() {
 
       <section className="border-t border-border py-20 sm:py-28">
         <Container>
-          <SectionHeader
-            eyebrow="Cómo se diseña"
-            title="La automatización no reemplaza el criterio, lo libera"
-            description="El objetivo no es eliminar personas del proceso, sino eliminar la parte del proceso que no requiere criterio humano. Definimos junto a tu equipo qué automatizar y qué debe seguir pasando por una persona."
-            align="center"
-          />
+          <Reveal>
+            <SectionHeader
+              eyebrow="Cómo se diseña"
+              title="La automatización no reemplaza el criterio, lo libera"
+              description="El objetivo no es eliminar personas del proceso, sino eliminar la parte del proceso que no requiere criterio humano. Definimos junto a tu equipo qué automatizar y qué debe seguir pasando por una persona."
+              align="center"
+            />
+          </Reveal>
         </Container>
       </section>
 
