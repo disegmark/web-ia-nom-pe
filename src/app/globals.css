@@ -348,3 +348,21 @@ body {
   .hero-cta-primary, .hero-cta-secondary { transition: none; }
   .hero-cta-primary:hover { transform: none; }
 }
+
+/* Slow band of light crossing a photo banner (see SectionPhoto). */
+@keyframes photo-sweep {
+  0%, 55% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  62% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(480%);
+    opacity: 0;
+  }
+}
+.photo-sweep {
+  animation: photo-sweep 9s ease-in-out infinite;
+}
