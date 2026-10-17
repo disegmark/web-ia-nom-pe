@@ -110,6 +110,26 @@ export function IndustryShowcase() {
     return () => timers.forEach(clearTimeout);
   }, [active, nonce, reduce]);
 
+  // The solution finder can ask to show a specific case ("Ver este caso en acción").
+  const activeRef = useRef(active);
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
+  useEffect(() => {
+    const onShowCase = (event: Event) => {
+      const target = INDUSTRY_CASES.findIndex((item) => item.id === (event as CustomEvent<string>).detail);
+      if (target < 0) return;
+      setRingStep((r) => r + shortestStep(activeRef.current, target));
+      setActive(target);
+      setStep(0);
+      setTyping(false);
+      setNonce((n) => n + 1);
+      manualUntilRef.current = event.timeStamp + MANUAL_HOLD_MS;
+    };
+    window.addEventListener("ia:show-case", onShowCase);
+    return () => window.removeEventListener("ia:show-case", onShowCase);
+  }, []);
+
   // `timeStamp` comes from the triggering event — same clock as performance.now() in the timers.
   function select(next: number, timeStamp: number) {
     const target = ((next % N) + N) % N;

@@ -5,7 +5,7 @@ import { IndustryShowcase } from "./IndustryShowcase";
 
 export function IndustriesSection() {
   return (
-    <section className="border-t border-border py-20 sm:py-28">
+    <section id="casos" className="scroll-mt-24 border-t border-border py-20 sm:py-28">
       <Container>
         <SignHeading
           title={
