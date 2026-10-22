@@ -20,6 +20,16 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Estudio creativo iA (`/studio`)
+
+Estudio privado para crear contenido con IA:
+
+- **Avatares** (HeyGen): avatares hiperrealistas de stock o creados desde una sola foto. El guion se divide en escenas (línea en blanco) para videos largos, con la voz de ElevenLabs sincronizada en los labios.
+- **Voces** (ElevenLabs): texto a voz en 25+ idiomas con control de estabilidad/estilo y clonación instantánea de voz.
+- **Video largo** (fal.ai → PixVerse, Kling, Veo 3): un guion por escenas (generado con Claude a partir de una idea), continuidad encadenando el último fotograma de cada escena con la siguiente, vista previa continua y unión final en un solo MP4.
+
+Configuración (`.env.local`, ver `.env.local.example`): `STUDIO_ACCESS_KEY` (obligatoria — sin ella el estudio queda bloqueado), `HEYGEN_API_KEY`, `ELEVENLABS_API_KEY`, `FAL_KEY` y `ANTHROPIC_API_KEY` (guion automático). Cada pestaña se activa solo si su proveedor está configurado. Los ids de los modelos de video están en `src/lib/studio/config.ts`.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
