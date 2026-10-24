@@ -13,6 +13,8 @@ const STATIC_ROUTES = [
   "/nosotros",
   "/contacto",
   "/blog",
+  "/privacidad",
+  "/terminos",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
