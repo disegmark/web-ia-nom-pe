@@ -64,6 +64,12 @@ const organizationJsonLd = {
   slogan: "Conectamos Inteligencia",
 };
 
+const GA_ID = "G-QSJ1MNP3NH";
+const gaSnippet = `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_ID}');`;
+
 const GTM_ID = "GTM-NH6P3CSJ";
 const gtmSnippet = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -78,6 +84,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/* Google Tag Manager */}
         <script dangerouslySetInnerHTML={{ __html: gtmSnippet }} />
         {/* End Google Tag Manager */}
+        {/* Google tag (gtag.js) */}
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+        <script dangerouslySetInnerHTML={{ __html: gaSnippet }} />
       </head>
       <body className="flex min-h-full flex-col antialiased">
         {/* Google Tag Manager (noscript) */}
