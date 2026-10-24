@@ -5,7 +5,7 @@ export const SITE_DESCRIPTION =
 export const SITE_URL = "https://ia.nom.pe";
 
 export const CONTACT_EMAIL = "hola@ia.nom.pe";
-export const WHATSAPP_NUMBER = "51927022433";
+export const WHATSAPP_NUMBER = "51998259080";
 export const WHATSAPP_DEFAULT_MESSAGE =
   "Hola, quiero conectar inteligencia en mi empresa. ¿Podemos conversar?";
 // Branded/trackable short link used wherever an AI-generated response hands out
