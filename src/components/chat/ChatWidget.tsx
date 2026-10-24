@@ -6,26 +6,43 @@ import { Loader2, MessageCircle, Send, X } from "lucide-react";
 import { Mark } from "@/components/brand/Mark";
 import { cn } from "@/lib/utils";
 import { linkifyText } from "@/lib/linkify";
-import { WHATSAPP_DEFAULT_MESSAGE, WHATSAPP_NUMBER } from "@/lib/constants";
+import { CHAT_360_URL, WHATSAPP_DEFAULT_MESSAGE, WHATSAPP_NUMBER } from "@/lib/constants";
 
 type ChatRole = "user" | "assistant";
 type ChatMessage = { role: ChatRole; content: string };
 
+type WebchatMessage = { id: number; remitente: "usuario" | "asistente" | "humano"; texto: string };
+type WebchatResponse = { mensajes?: WebchatMessage[]; modo?: "ia" | "humano"; error?: string };
+
 const GREETING: ChatMessage = {
   role: "assistant",
   content:
-    "¡Hola! Soy el asistente de ia.nom.pe. Pregúntame sobre nuestros servicios, agentes iA, automatización o integraciones.",
+    "¡Hola! Soy el asistente de ia.nom.pe. Pregúntame sobre nuestros servicios, agentes iA, automatización o integraciones, o agenda una reunión conmigo.",
 };
 
-const SUGGESTIONS = [
-  "¿Qué servicios ofrecen?",
-  "¿Qué es un agente iA?",
-  "¿Cómo empiezo un proyecto?",
-];
+const SUGGESTIONS = ["¿Qué servicios ofrecen?", "Quiero agendar una reunión", "¿Cómo empiezo un proyecto?"];
 
 const WHATSAPP_HREF = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_DEFAULT_MESSAGE)}`;
 
 const MAX_HISTORY_SENT = 12;
+const MAX_INPUT = 1000;
+const WEBCHAT = `${CHAT_360_URL}/api/webchat`;
+const SESSION_KEY = "ia-nom-pe-chat-session";
+const SESSION_RE = /^[A-Za-z0-9-]{16,64}$/;
+const HUMAN_POLL_MS = 5000;
+
+const toChatMessage = (m: WebchatMessage): ChatMessage => ({
+  role: m.remitente === "usuario" ? "user" : "assistant",
+  content: m.texto,
+});
+
+function newSessionId(): string {
+  try {
+    return crypto.randomUUID();
+  } catch {
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+  }
+}
 
 export function ChatWidget() {
   const shouldReduceMotion = useReducedMotion();
@@ -34,9 +51,37 @@ export function ChatWidget() {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
+  const [withHuman, setWithHuman] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const sessionRef = useRef<string | null>(null);
+  const lastIdRef = useRef(0);
+  const loadedRef = useRef(false);
+
+  function getSession(): string {
+    if (sessionRef.current) return sessionRef.current;
+    let id: string | null = null;
+    try {
+      id = localStorage.getItem(SESSION_KEY);
+    } catch {
+      // storage can be blocked; the session then lives only for this page view
+    }
+    if (!id || !SESSION_RE.test(id)) {
+      id = newSessionId();
+      try {
+        localStorage.setItem(SESSION_KEY, id);
+      } catch {
+        // ignore
+      }
+    }
+    sessionRef.current = id;
+    return id;
+  }
+
+  function track(list: WebchatMessage[]) {
+    for (const m of list) lastIdRef.current = Math.max(lastIdRef.current, m.id);
+  }
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -46,8 +91,92 @@ export function ChatWidget() {
     if (isOpen) inputRef.current?.focus();
   }, [isOpen]);
 
+  // First open: recover this visitor's conversation from the internal system, or show its greeting.
+  useEffect(() => {
+    if (!isOpen || loadedRef.current) return;
+    loadedRef.current = true;
+    const session = getSession();
+    (async () => {
+      try {
+        const history = await fetch(`${WEBCHAT}/mensajes?sesion=${session}`);
+        if (!history.ok) return;
+        const data = (await history.json()) as { mensajes?: WebchatMessage[]; modo?: string };
+        if (data.mensajes?.length) {
+          track(data.mensajes);
+          setMessages(data.mensajes.map(toChatMessage));
+          setWithHuman(data.modo === "humano");
+          return;
+        }
+        const config = await fetch(`${WEBCHAT}/config`);
+        if (!config.ok) return;
+        const { bienvenida } = (await config.json()) as { bienvenida?: string };
+        if (bienvenida) setMessages([{ role: "assistant", content: bienvenida }]);
+      } catch {
+        // offline or blocked: keep the local greeting; sending will use the fallback assistant
+      }
+    })();
+  }, [isOpen]);
+
+  // When a person from the team has taken the conversation, pick up their replies.
+  useEffect(() => {
+    if (!isOpen || !withHuman) return;
+    const session = sessionRef.current;
+    if (!session) return;
+    const id = window.setInterval(async () => {
+      try {
+        const res = await fetch(`${WEBCHAT}/mensajes?sesion=${session}&desde=${lastIdRef.current}`);
+        if (!res.ok) return;
+        const data = (await res.json()) as { mensajes?: WebchatMessage[]; modo?: string };
+        const fresh = data.mensajes ?? [];
+        if (fresh.length) {
+          track(fresh);
+          const incoming = fresh.filter((m) => m.remitente !== "usuario").map(toChatMessage);
+          if (incoming.length) setMessages((prev) => [...prev, ...incoming]);
+        }
+        if (data.modo === "ia") setWithHuman(false);
+      } catch {
+        // try again on the next tick
+      }
+    }, HUMAN_POLL_MS);
+    return () => window.clearInterval(id);
+  }, [isOpen, withHuman]);
+
+  // Backup when the internal system cannot be reached: answers from the site's own information (no booking).
+  async function askFallback(history: ChatMessage[]) {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: history.slice(-MAX_HISTORY_SENT) }),
+    });
+
+    if (response.status === 503) {
+      setUnavailable(true);
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "El chat todavía no está activo. Escríbenos por WhatsApp y te respondemos directamente." },
+      ]);
+      return;
+    }
+    if (!response.ok || !response.body) throw new Error(`chat request failed: ${response.status}`);
+
+    setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      setMessages((prev) => {
+        const next = [...prev];
+        const last = next[next.length - 1];
+        next[next.length - 1] = { ...last, content: last.content + chunk };
+        return next;
+      });
+    }
+  }
+
   async function sendMessage(text: string) {
-    const trimmed = text.trim();
+    const trimmed = text.trim().slice(0, MAX_INPUT);
     if (!trimmed || isStreaming) return;
 
     const history = [...messages, { role: "user" as const, content: trimmed }];
@@ -56,45 +185,40 @@ export function ChatWidget() {
     setIsStreaming(true);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: history.slice(-MAX_HISTORY_SENT) }),
-      });
-
-      if (response.status === 503) {
-        setUnavailable(true);
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: "El chat todavía no está activo. Escríbenos por WhatsApp y te respondemos directamente.",
-          },
-        ]);
-        return;
-      }
-
-      if (!response.ok || !response.body) {
-        throw new Error(`chat request failed: ${response.status}`);
-      }
-
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        setMessages((prev) => {
-          const next = [...prev];
-          const last = next[next.length - 1];
-          next[next.length - 1] = { ...last, content: last.content + chunk };
-          return next;
+      let reached = false;
+      try {
+        const res = await fetch(`${WEBCHAT}/mensaje`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sesion: getSession(), texto: trimmed }),
         });
+        if (res.status === 429 || res.status === 400) {
+          const data = (await res.json().catch(() => null)) as WebchatResponse | null;
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: data?.error ?? "Un momento, estoy respondiendo tu mensaje anterior." },
+          ]);
+          reached = true;
+        } else if (res.ok) {
+          const data = (await res.json()) as WebchatResponse;
+          const incoming = (data.mensajes ?? []).filter((m) => m.remitente !== "usuario");
+          track(data.mensajes ?? []);
+          const human = data.modo === "humano";
+          setWithHuman(human);
+          setMessages((prev) => [
+            ...prev,
+            ...incoming.map(toChatMessage),
+            ...(human && incoming.length === 0
+              ? [{ role: "assistant" as const, content: "Una persona del equipo está atendiendo esta conversación y te responderá aquí en breve." }]
+              : []),
+          ]);
+          reached = true;
+        }
+      } catch (error) {
+        console.error("[chat-widget] internal system unreachable", error);
       }
+
+      if (!reached) await askFallback(history);
     } catch (error) {
       console.error("[chat-widget] send failed", error);
       setMessages((prev) => [
@@ -150,22 +274,17 @@ export function ChatWidget() {
               <Mark className="h-8 w-8 shrink-0" />
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-foreground">ia.nom.pe</p>
-                <p className="truncate text-xs text-muted">Asistente de servicios</p>
+                <p className="truncate text-xs text-muted">{withHuman ? "Te atiende una persona del equipo" : "Asistente · agenda reuniones"}</p>
               </div>
             </div>
 
             <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
               {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={cn("flex", message.role === "user" ? "justify-end" : "justify-start")}
-                >
+                <div key={index} className={cn("flex", message.role === "user" ? "justify-end" : "justify-start")}>
                   <p
                     className={cn(
                       "max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
-                      message.role === "user"
-                        ? "bg-primary text-white"
-                        : "border border-border bg-background text-foreground",
+                      message.role === "user" ? "bg-primary text-white" : "border border-border bg-background text-foreground",
                     )}
                   >
                     {linkifyText(message.content, `msg-${index}`)}
@@ -204,6 +323,7 @@ export function ChatWidget() {
                 onChange={(event) => setInput(event.target.value)}
                 onKeyDown={handleKeyDown}
                 rows={1}
+                maxLength={MAX_INPUT}
                 disabled={unavailable}
                 placeholder={unavailable ? "Chat no disponible — usa WhatsApp" : "Escribe tu pregunta…"}
                 aria-label="Mensaje para el asistente"

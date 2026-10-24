@@ -4,6 +4,24 @@ import type { ReactNode } from "react";
 const LINK_RE = /\[([^\]]+)\]\((https?:\/\/\S+?)\)|(https?:\/\/\S+)/g;
 const TRAILING_PUNCTUATION_RE = /[.,;:!?)]+$/;
 
+const BOLD_RE = /\*([^*\n]+)\*/g;
+
+/** WhatsApp-style `*bold*` (the 360 assistant writes that way) rendered as bold text. */
+function boldify(text: string, keyPrefix: string): ReactNode[] {
+  const out: ReactNode[] = [];
+  let last = 0;
+  let n = 0;
+  let m: RegExpExecArray | null;
+  BOLD_RE.lastIndex = 0;
+  while ((m = BOLD_RE.exec(text)) !== null) {
+    if (m.index > last) out.push(text.slice(last, m.index));
+    out.push(<strong key={`${keyPrefix}-b-${n++}`}>{m[1]}</strong>);
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
+
 /**
  * Renders chat message text with any link made clickable. Chat bubbles show
  * plain text (no Markdown renderer), so a model that slips into `[label](url)`
@@ -19,7 +37,7 @@ export function linkifyText(text: string, keyPrefix: string): ReactNode[] {
     const [full, mdLabel, mdUrl, bareUrl] = match;
 
     if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index));
+      parts.push(...boldify(text.slice(lastIndex, match.index), `${keyPrefix}-t${linkIndex}`));
     }
 
     let url = mdUrl ?? bareUrl;
@@ -48,6 +66,6 @@ export function linkifyText(text: string, keyPrefix: string): ReactNode[] {
     lastIndex = match.index + full.length;
   }
 
-  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
+  if (lastIndex < text.length) parts.push(...boldify(text.slice(lastIndex), `${keyPrefix}-tail`));
   return parts;
 }

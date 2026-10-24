@@ -8,9 +8,9 @@ export const CONTACT_EMAIL = "hola@ia.nom.pe";
 export const WHATSAPP_NUMBER = "51998259080";
 export const WHATSAPP_DEFAULT_MESSAGE =
   "Hola, quiero conectar inteligencia en mi empresa. ¿Podemos conversar?";
-// Branded/trackable short link used wherever an AI-generated response hands out
-// a WhatsApp link as text (the raw wa.me URL is still used for real anchor buttons).
-export const WHATSAPP_SHORT_LINK = "https://bit.ly/Lois-iA";
+export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
+// Sistema interno (dashboard) al que se conecta el chat web: atiende, agenda reuniones y guarda la conversación.
+export const CHAT_360_URL = "https://360.ia.nom.pe";
 
 export const NAV_LINKS = [
   { label: "Soluciones", href: "/soluciones" },
